@@ -1,5 +1,6 @@
-# Here is a simple flow chart:
-Description 
+# Sequence Diagram for Exercise 0.4: New note diagram
+
+This is the sequence diagram for a new note created at https://studies.cs.helsinki.fi/exampleapp/notes
 
 ```mermaid
     sequenceDiagram
