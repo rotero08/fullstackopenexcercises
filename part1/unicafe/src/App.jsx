@@ -5,6 +5,12 @@ const Button = ({ handleClick, text }) => (
   <button onClick={handleClick}>{text}</button>
 );
 
+const StatisticsLine = ({ text, value }) => (
+  <p>
+    {text} {value}
+  </p>
+);
+
 const Statistics = (props) => {
   if (props.all == 0) {
     return (
@@ -17,12 +23,12 @@ const Statistics = (props) => {
   return (
     <div>
       <h1>statistics</h1>
-      <p>good {props.good}</p>
-      <p>neutral {props.neutral}</p>
-      <p>bad {props.bad}</p>
-      <p>all {props.all}</p>
-      <p>average {props.average}</p>
-      <p>positive {props.positive} %</p>
+      <StatisticsLine text="good" value={props.good} />
+      <StatisticsLine text="neutral" value={props.neutral} />
+      <StatisticsLine text="bad" value={props.bad} />
+      <StatisticsLine text="all" value={props.all} />
+      <StatisticsLine text="average" value={props.average} />
+      <StatisticsLine text="positive" value={props.positive} />
     </div>
   );
 };
@@ -68,3 +74,4 @@ const App = () => {
 };
 
 export default App;
+d808483391a92039641a57144929eb886593078f;
