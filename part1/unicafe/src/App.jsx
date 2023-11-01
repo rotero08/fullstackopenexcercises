@@ -6,6 +6,14 @@ const Button = ({ handleClick, text }) => (
 );
 
 const Statistics = (props) => {
+  if (props.all == 0) {
+    return (
+      <div>
+        <h1>statistics</h1>
+        <p>No feedback given</p>
+      </div>
+    );
+  }
   return (
     <div>
       <h1>statistics</h1>
