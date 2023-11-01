@@ -6,9 +6,10 @@ const Button = ({ handleClick, text }) => (
 );
 
 const StatisticsLine = ({ text, value }) => (
-  <p>
-    {text} {value}
-  </p>
+  <tr>
+    <td>{text}</td>
+    <td>{value}</td>
+  </tr>
 );
 
 const Statistics = (props) => {
@@ -23,12 +24,16 @@ const Statistics = (props) => {
   return (
     <div>
       <h1>statistics</h1>
-      <StatisticsLine text="good" value={props.good} />
-      <StatisticsLine text="neutral" value={props.neutral} />
-      <StatisticsLine text="bad" value={props.bad} />
-      <StatisticsLine text="all" value={props.all} />
-      <StatisticsLine text="average" value={props.average} />
-      <StatisticsLine text="positive" value={props.positive} />
+      <table>
+        <tbody>
+          <StatisticsLine text="good" value={props.good} />
+          <StatisticsLine text="neutral" value={props.neutral} />
+          <StatisticsLine text="bad" value={props.bad} />
+          <StatisticsLine text="all" value={props.all} />
+          <StatisticsLine text="average" value={props.average} />
+          <StatisticsLine text="positive" value={props.positive} />
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -74,4 +79,3 @@ const App = () => {
 };
 
 export default App;
-d808483391a92039641a57144929eb886593078f;
