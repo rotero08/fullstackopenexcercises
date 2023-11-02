@@ -18,6 +18,7 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
+  const [points, setPoints] = useState(new Uint8Array(8));
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -27,9 +28,17 @@ const App = () => {
     setSelected(getRandomInt(8));
   };
 
+  const handleVoteClick = () => {
+    const pointsCopy = [...points];
+    pointsCopy[selected] += 1;
+    setPoints(pointsCopy);
+  };
+
   return (
     <div>
       <p>{anecdotes[selected]}</p>
+      <p>has {points[selected]} votes</p>
+      <Button handleClick={handleVoteClick} text="vote" />
       <Button handleClick={handleAnecdoteClick} text="next anecdote" />
     </div>
   );
