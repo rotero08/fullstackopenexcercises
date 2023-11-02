@@ -24,6 +24,12 @@ const App = () => {
     return Math.floor(Math.random() * max);
   }
 
+  function indexLargestElement(arr) {
+    const max = Math.max(...arr);
+    const index = arr.indexOf(max);
+    return index;
+  }
+
   const handleAnecdoteClick = () => {
     setSelected(getRandomInt(8));
   };
@@ -36,10 +42,13 @@ const App = () => {
 
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>has {points[selected]} votes</p>
       <Button handleClick={handleVoteClick} text="vote" />
       <Button handleClick={handleAnecdoteClick} text="next anecdote" />
+      <h1>Anecdote with most votes</h1>
+      <p>{anecdotes[indexLargestElement(points)]}</p>
     </div>
   );
 };
