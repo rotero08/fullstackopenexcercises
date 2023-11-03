@@ -1,39 +1,39 @@
-const Header = (props) => {
+const Header = ({ name }) => {
   return (
     <>
-      <h1>{props.course}</h1>
+      <h1>{name}</h1>
     </>
   );
 };
 
-const Part = (props) => {
+const Part = ({ name, exercises }) => {
   return (
     <div>
       <p>
-        {props.name} {props.exercises}
+        {name} {exercises}
       </p>
     </div>
   );
 };
 
-const Content = (props) => {
+const Content = ({ parts }) => {
   return (
     <>
-      <Part name={props.part[0].name} exercises={props.part[0].exercises} />
-      <Part name={props.part[1].name} exercises={props.part[1].exercises} />
-      <Part name={props.part[2].name} exercises={props.part[2].exercises} />
+      {parts.map((part) => (
+        <Part key={part.id} name={part.name} exercises={part.exercises} />
+      ))}
     </>
   );
 };
 
-const Total = (props) => {
-  const total = props.total.reduce((sum, part) => {
-    return sum + part.exercises;
-  }, 0);
+const Total = ({ parts }) => {
+  const total = parts.reduce((sum, part) => sum + part.exercises, 0);
 
   return (
     <div>
-      <p>Number of exercises {total}</p>
+      <p>
+        <b>total of {total} exercises</b>
+      </p>
     </div>
   );
 };
@@ -41,9 +41,9 @@ const Total = (props) => {
 const Course = ({ course }) => {
   return (
     <div>
-      <Header course={course.name} />
-      <Content part={course.parts} />
-      <Total total={course.parts} />
+      <Header name={course.name} />
+      <Content parts={course.parts} />
+      <Total parts={course.parts} />
     </div>
   );
 };
