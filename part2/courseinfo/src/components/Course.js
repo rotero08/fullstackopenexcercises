@@ -26,11 +26,24 @@ const Content = (props) => {
   );
 };
 
+const Total = (props) => {
+  let total =
+    props.total[0].exercises +
+    props.total[1].exercises +
+    props.total[2].exercises;
+  return (
+    <div>
+      <p>Number of exercises {total}</p>
+    </div>
+  );
+};
+
 const Course = ({ course }) => {
   return (
     <div>
       <Header course={course.name} />
       <Content part={course.parts} />
+      <Total total={course.parts} />
     </div>
   );
 };
