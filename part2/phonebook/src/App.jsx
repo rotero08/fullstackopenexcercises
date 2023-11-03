@@ -1,6 +1,33 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
 
+const Filter = ({ newFilter, handleFilterInput }) => {
+  return (
+    <div>
+      filter shown with <input value={newFilter} onChange={handleFilterInput} />
+    </div>
+  );
+};
+
+const PersonForm = (props) => {
+  return (
+    <div>
+      <form onSubmit={props.handleSubmit}>
+        <div>
+          name: <input value={props.newName} onChange={props.handleNameInput} />
+        </div>
+        <div>
+          number:{" "}
+          <input value={props.newNumber} onChange={props.handleNumberInput} />
+        </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
 const Persons = ({ person }) => {
   return (
     <li>
@@ -59,22 +86,16 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with{" "}
-        <input value={newFilter} onChange={handleFilterInput} />
-      </div>
+      <Filter newFilter={newFilter} handleFilterInput={handleFilterInput} />
       <h2>add a new</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input value={newName} onChange={handleNameInput} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberInput} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm
+        handleSubmit={handleSubmit}
+        handleFilterInput={handleFilterInput}
+        handleNameInput={handleNameInput}
+        handleNumberInput={handleNumberInput}
+        newName={newName}
+        newNumber={newNumber}
+      />
       <h2>Numbers</h2>
       <ul>
         {filteredPersons.map((person) => (
