@@ -16,6 +16,15 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    const nameDuplicate = (person) =>
+      JSON.stringify(person.name) === JSON.stringify(newName);
+
+    const duplicate = persons.some(nameDuplicate);
+
+    if (duplicate) {
+      return alert(`${newName} is already added to phonebook`);
+    }
+
     const newPerson = {
       name: newName,
     };
