@@ -70,16 +70,33 @@ const App = () => {
     const nameDuplicate = (person) =>
       JSON.stringify(person.name) === JSON.stringify(newName);
 
-    const duplicate = persons.some(nameDuplicate);
-
-    if (duplicate) {
-      return alert(`${newName} is already added to phonebook`);
-    }
+    const isDuplicate = persons.some(nameDuplicate);
 
     const newPerson = {
       name: newName,
       number: newNumber,
     };
+
+    if (isDuplicate) {
+      const duplicateId = persons.filter(nameDuplicate)[0].id;
+      if (
+        !window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        return;
+      }
+      personsService.update(duplicateId, newPerson).then((response) => {
+        setPersons(
+          persons.map((person) =>
+            person.id === duplicateId ? newPerson : person
+          )
+        );
+        setNewName("");
+        setNewNumber("");
+      });
+      return;
+    }
 
     personsService.create(newPerson).then((response) => {
       setPersons(persons.concat(response.data));
