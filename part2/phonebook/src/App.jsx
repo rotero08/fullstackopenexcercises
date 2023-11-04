@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
-import axios from "axios";
+import personsService from "./services/persons";
 
 const Filter = ({ newFilter, handleFilterInput }) => {
   return (
@@ -44,9 +44,7 @@ const App = () => {
   const [newFilter, setNewFilter] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3002/persons")
-      .then((response) => setPersons(response.data));
+    personsService.getAll().then((response) => setPersons(response.data));
   }, []);
 
   const handleNameInput = (event) => {
@@ -78,7 +76,11 @@ const App = () => {
       number: newNumber,
     };
 
-    setPersons(persons.concat(newPerson));
+    personsService.create(newPerson).then((response) => {
+      setPersons(persons.concat(newPerson));
+      setNewName("");
+      setNewNumber("");
+    });
   };
 
   const filteredPersons = persons.filter((person) =>
