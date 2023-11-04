@@ -29,10 +29,11 @@ const PersonForm = (props) => {
   );
 };
 
-const Persons = ({ person }) => {
+const Persons = ({ person, handleDelete }) => {
   return (
     <li>
-      {person.name} {person.number}
+      {person.name} {person.number}{" "}
+      <button onClick={handleDelete}>delete</button>
     </li>
   );
 };
@@ -44,7 +45,11 @@ const App = () => {
   const [newFilter, setNewFilter] = useState("");
 
   useEffect(() => {
-    personsService.getAll().then((response) => setPersons(response.data));
+    console.log("Fetching data from the backend...");
+    personsService.getAll().then((response) => {
+      console.log("Data fetched from the backend:", response.data);
+      setPersons(response.data);
+    });
   }, []);
 
   const handleNameInput = (event) => {
@@ -77,9 +82,19 @@ const App = () => {
     };
 
     personsService.create(newPerson).then((response) => {
-      setPersons(persons.concat(newPerson));
+      setPersons(persons.concat(response.data));
       setNewName("");
       setNewNumber("");
+    });
+  };
+
+  const handleDelete = (person) => {
+    if (!window.confirm(`Delete ${person.name}`)) {
+      return console.log(person.id);
+    }
+    console.log(persons);
+    personsService.deletes(person.id).then((response) => {
+      setPersons(persons.filter((per) => per.id !== person.id));
     });
   };
 
@@ -103,7 +118,11 @@ const App = () => {
       <h2>Numbers</h2>
       <ul>
         {filteredPersons.map((person) => (
-          <Persons key={person.name} person={person} />
+          <Persons
+            key={person.name}
+            person={person}
+            handleDelete={() => handleDelete(person)}
+          />
         ))}
       </ul>
     </div>
