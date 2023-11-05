@@ -2,6 +2,18 @@
 import { useState, useEffect } from "react";
 import personsService from "./services/persons";
 
+const Notification = ({ notificationMessage, isError }) => {
+  if (notificationMessage === null) {
+    return null;
+  }
+
+  if (!isError) {
+    return <div className="success">{notificationMessage}</div>;
+  }
+
+  return <div className="error">{notificationMessage}</div>;
+};
+
 const Filter = ({ newFilter, handleFilterInput }) => {
   return (
     <div>
@@ -43,11 +55,11 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    console.log("Fetching data from the backend...");
     personsService.getAll().then((response) => {
-      console.log("Data fetched from the backend:", response.data);
       setPersons(response.data);
     });
   }, []);
@@ -86,15 +98,31 @@ const App = () => {
       ) {
         return;
       }
-      personsService.update(duplicateId, newPerson).then((response) => {
-        setPersons(
-          persons.map((person) =>
-            person.id === duplicateId ? newPerson : person
-          )
-        );
-        setNewName("");
-        setNewNumber("");
-      });
+      personsService
+        .update(duplicateId, newPerson)
+        .then((response) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === duplicateId ? newPerson : person
+            )
+          );
+          setNewName("");
+          setNewNumber("");
+          setIsError(false);
+          setNotificationMessage(`${response.data.name} changed number`);
+          setTimeout(() => {
+            setNotificationMessage(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          setIsError(true);
+          setNotificationMessage(
+            `Information of ${newPerson.name} has already been removed from server`
+          );
+          setTimeout(() => {
+            setNotificationMessage(null);
+          }, 5000);
+        });
       return;
     }
 
@@ -102,6 +130,11 @@ const App = () => {
       setPersons(persons.concat(response.data));
       setNewName("");
       setNewNumber("");
+      setIsError(false);
+      setNotificationMessage(`Added ${response.data.name}`);
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
     });
   };
 
@@ -109,10 +142,20 @@ const App = () => {
     if (!window.confirm(`Delete ${person.name}`)) {
       return console.log(person.id);
     }
-    console.log(persons);
-    personsService.deletes(person.id).then((response) => {
-      setPersons(persons.filter((per) => per.id !== person.id));
-    });
+    personsService
+      .deletes(person.id)
+      .then((response) => {
+        setPersons(persons.filter((per) => per.id !== person.id));
+      })
+      .catch((error) => {
+        setIsError(true);
+        setNotificationMessage(
+          `Information of ${person.name} has already been removed from server`
+        );
+        setTimeout(() => {
+          setNotificationMessage(null);
+        }, 5000);
+      });
   };
 
   const filteredPersons = persons.filter((person) =>
@@ -122,6 +165,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification
+        notificationMessage={notificationMessage}
+        isError={isError}
+      />
       <Filter newFilter={newFilter} handleFilterInput={handleFilterInput} />
       <h2>add a new</h2>
       <PersonForm
