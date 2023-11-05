@@ -35,7 +35,7 @@ const Countries = ({ country, setShowCountry }) => {
   return (
     <li>
       {country.name.common}{" "}
-      <button onClick={() => setShowCountry(country)}>show</button>{" "}
+      <button onClick={setShowCountry(country)}>show</button>{" "}
     </li>
   );
 };
@@ -62,11 +62,8 @@ const App = () => {
 
   const setShowCountry = (country) => {
     filteredCountries = countries.filter((countryItem) =>
-      countryItem.name.common
-        .toLowerCase()
-        .startsWith(country.name.common.toLowerCase())
+      countryItem.name.common.toLowerCase().startsWith(country.toLowerCase())
     );
-    setNewFilter(country.name.common);
   };
 
   if (filteredCountries.length > 10) {
@@ -91,7 +88,6 @@ const App = () => {
         {filteredCountries.map((country) => (
           <Countries
             key={country.name.common}
-            country={country}
             setShowCountry={setShowCountry}
           />
         ))}
