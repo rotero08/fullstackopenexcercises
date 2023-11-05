@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import axios from "axios";
+const api_key = import.meta.env.VITE_SOME_KEY;
 
 const Filter = ({ newFilter, handleFilterInput }) => {
   return (
@@ -11,10 +12,28 @@ const Filter = ({ newFilter, handleFilterInput }) => {
 };
 
 const Country = ({ country }) => {
+  const [weatherReport, setWeatherReport] = useState(null);
+
+  const lat = country.capitalInfo.latlng[0];
+  const lon = country.capitalInfo.latlng[1];
+
   let languages = [];
   Object.entries(country.languages).map((entry) => {
     languages.push(entry[1]);
   });
+
+  const celcius = (kelvin) => kelvin - 273;
+
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${api_key}`
+      )
+      .then((response) => {
+        setWeatherReport(response.data.list[0]);
+      });
+  }, []);
+
   return (
     <div>
       <h2>{country.name.common}</h2>
@@ -27,6 +46,19 @@ const Country = ({ country }) => {
         ))}
       </ul>
       <img src={country.flags.png} />
+      <h3>Weather in {country.capital}</h3>
+      {weatherReport ? (
+        <div>
+          <p>temperature {celcius(weatherReport.main.temp).toFixed(2)}</p>
+          <img
+            src={`https://openweathermap.org/img/wn/${weatherReport.weather[0].icon}@2x.png`}
+            alt="Weather icon"
+          />
+          <p>wind {weatherReport.wind.speed} m/s</p>
+        </div>
+      ) : (
+        <p></p>
+      )}
     </div>
   );
 };
@@ -56,16 +88,11 @@ const App = () => {
     setNewFilter(event.target.value);
   };
 
-  let filteredCountries = countries.filter((country) =>
+  const filteredCountries = countries.filter((country) =>
     country.name.common.toLowerCase().startsWith(newFilter.toLowerCase())
   );
 
   const setShowCountry = (country) => {
-    filteredCountries = countries.filter((countryItem) =>
-      countryItem.name.common
-        .toLowerCase()
-        .startsWith(country.name.common.toLowerCase())
-    );
     setNewFilter(country.name.common);
   };
 
