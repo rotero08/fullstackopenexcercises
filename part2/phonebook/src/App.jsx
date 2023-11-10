@@ -60,6 +60,7 @@ const App = () => {
 
   useEffect(() => {
     personsService.getAll().then((response) => {
+      console.log(response.data);
       setPersons(response.data);
     });
   }, []);
@@ -79,10 +80,9 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const nameDuplicate = (person) =>
-      JSON.stringify(person.name) === JSON.stringify(newName);
-
-    const isDuplicate = persons.some(nameDuplicate);
+    const isDuplicate = persons.some(
+      (person) => JSON.stringify(person.name) === JSON.stringify(newName)
+    );
 
     const newPerson = {
       name: newName,
