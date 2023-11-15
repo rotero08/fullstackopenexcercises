@@ -60,10 +60,9 @@ const App = () => {
 
   useEffect(() => {
     personsService.getAll().then((response) => {
-      console.log(response.data);
       setPersons(response.data);
     });
-  }, []);
+  }, [newName]);
 
   const handleNameInput = (event) => {
     setNewName(event.target.value);
@@ -80,17 +79,19 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const isDuplicate = persons.some(
-      (person) => JSON.stringify(person.name) === JSON.stringify(newName)
-    );
-
     const newPerson = {
       name: newName,
       number: newNumber,
     };
 
+    const nameDuplicate = (person) =>
+      JSON.stringify(person.name) === JSON.stringify(newName);
+
+    const isDuplicate = persons.some(nameDuplicate);
+
     if (isDuplicate) {
       const duplicateId = persons.filter(nameDuplicate)[0].id;
+
       if (
         !window.confirm(
           `${newName} is already added to phonebook, replace the old number with a new one?`
@@ -98,6 +99,7 @@ const App = () => {
       ) {
         return;
       }
+
       personsService
         .update(duplicateId, newPerson)
         .then((response) => {
@@ -126,16 +128,25 @@ const App = () => {
       return;
     }
 
-    personsService.create(newPerson).then((response) => {
-      setPersons(persons.concat(response.data));
-      setNewName("");
-      setNewNumber("");
-      setIsError(false);
-      setNotificationMessage(`Added ${response.data.name}`);
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
-    });
+    personsService
+      .create(newPerson)
+      .then((response) => {
+        setPersons(persons.concat(response.data));
+        setNewName("");
+        setNewNumber("");
+        setIsError(false);
+        setNotificationMessage(`Added ${response.data.name}`);
+        setTimeout(() => {
+          setNotificationMessage(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        setIsError(true);
+        setNotificationMessage(`${error.response.data.error}`);
+        setTimeout(() => {
+          setNotificationMessage(null);
+        }, 5000);
+      });
   };
 
   const handleDelete = (person) => {
@@ -148,6 +159,7 @@ const App = () => {
         setPersons(persons.filter((per) => per.id !== person.id));
       })
       .catch((error) => {
+        console.log(person.id);
         setIsError(true);
         setNotificationMessage(
           `Information of ${person.name} has already been removed from server`

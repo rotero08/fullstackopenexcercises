@@ -9,8 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "server": "json-server -p3002 --watch db.json",
-    "build:ui": "rm -rf dist && cd ../phonebook && npm run build && cp -r dist \"D:\\1)Descargas\\Universidad Nacional De Bogota\\Computer Science\\1. Intro CS\\Full Stack Open\\courseactivities\\part2-backend\"",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "build:ui": "rm -rf dist && cd ../phonebook && npm run build && cp -r dist \"D:\\1)Descargas\\Universidad Nacional De Bogota\\Computer Science\\1. Intro CS\\Full Stack Open\\fullstackopenexcecises (3-13)\\part3 - phonebook-backend\""
   },
   "dependencies": {
     "axios": "^1.6.0",
