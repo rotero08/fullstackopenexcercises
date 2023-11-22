@@ -51,11 +51,36 @@ function mostBlogs(blogs) {
     }
   
     return topAuthor ? { author: topAuthor, blogs: maxBlogs } : null;
-  }
+}
+
+function mostLikes(blogs) {
+    const blogCounts = {};
+  
+    blogs.forEach(blog => {
+      if (blogCounts[blog.author]) {
+        blogCounts[blog.author] += blog.likes;
+      } else {
+        blogCounts[blog.author] = blog.likes;
+      }
+    });
+  
+    let maxLikes = 0;
+    let topAuthor = '';
+  
+    for (const author in blogCounts) {
+      if (blogCounts[author] > maxLikes) {
+        maxLikes = blogCounts[author];
+        topAuthor = author;
+      }
+    }
+  
+    return topAuthor ? { author: topAuthor, likes: maxLikes } : null;
+}
 
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
     mostBlogs,
+    mostLikes,
 }
