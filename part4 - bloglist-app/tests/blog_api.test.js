@@ -32,6 +32,32 @@ test('blogs unique identifier is named id', async () => {
     await Promise.all(promiseArray)
 })
 
+test('blogs are successfully created and increased by one', async () => {
+    const newBlog = {
+        _id: "5a422bc61b54a676234d17fc",
+        title: "Type wars",
+        author: "Robert C. Martin",
+        url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+        likes: 2,
+        __v: 0
+    }
+    
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+
+    const contents = response.body.map(r => r.title)
+
+    expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
+    expect(contents).toContain(
+    'Type wars'
+  )
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
