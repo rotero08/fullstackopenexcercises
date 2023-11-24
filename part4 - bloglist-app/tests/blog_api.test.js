@@ -95,6 +95,12 @@ test('blogs without title or url outputs bad request', async () => {
         .expect(400)
 })
 
+test('blogs are deleted successfully', async () => {
+    await api
+        .delete('/api/blogs/5a422b891b54a676234d17fa')
+        .expect(204)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
