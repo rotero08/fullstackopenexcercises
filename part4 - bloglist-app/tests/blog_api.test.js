@@ -27,8 +27,8 @@ test('blogs unique identifier is named id', async () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-    const blogObjets = response.body
-    const promiseArray = blogObjets.map(blog => expect(blog.id).toBeDefined())
+    const blogObjects = response.body
+    const promiseArray = blogObjects.map(blog => expect(blog.id).toBeDefined())
     await Promise.all(promiseArray)
 })
 
@@ -79,6 +79,20 @@ test('blogs without likes have 0 likes by default', async () => {
 
     expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
     expect(createdBlog.likes).toEqual(0)
+})
+
+test('blogs without title or url outputs bad request', async () => {
+    const newBlog = {
+        _id: "5a422bc61b54a676234d17fc",
+        author: "Robert C. Martin",
+        likes: 2,
+        __v: 0
+    }
+    
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
 })
 
 afterAll(async () => {
