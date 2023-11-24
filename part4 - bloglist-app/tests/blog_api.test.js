@@ -101,6 +101,22 @@ test('blogs are deleted successfully', async () => {
         .expect(204)
 })
 
+test('blogs are updated successfully', async () => {
+    const updateBlog = {
+        likes: 131,
+    }
+
+    await api
+        .put('/api/blogs/5a422b891b54a676234d17fa')
+        .send(updateBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+    
+    const response = await api.get('/api/blogs')
+    const updatedBlog = response.body.find(blog => blog.id==="5a422b891b54a676234d17fa")
+    expect(updatedBlog.likes).toEqual(131)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
