@@ -2,9 +2,12 @@ const mongoose = require('mongoose')
 const helper = require("./test_helper")
 const supertest = require('supertest')
 const app = require('../app')
+const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 const Blog = require('../models/blog')
+
+let headers
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -12,20 +15,42 @@ beforeEach(async () => {
       .map(blog => new Blog(blog))
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
+    
 })
 
-const api = supertest(app)
+beforeEach(async () => {
+  await User.deleteMany({});
+  const newUser = {
+    username: 'root',
+    name: 'root',
+    password: 'password',
+  }
+
+  await api
+    .post('/api/users')
+    .send(newUser)
+
+  const result = await api
+    .post('/api/login')
+    .send(newUser)
+
+  headers = {
+    'Authorization': `Bearer ${result.body.token}`
+  }
+})
 
 test('blogs are returned as json', async () => {
   await api
     .get('/api/blogs')
     .expect(200)
+    .set(headers)
     .expect('Content-Type', /application\/json/)
 })
 
 test('blogs unique identifier is named id', async () => {
     const response = await api
       .get('/api/blogs')
+      .set(headers)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
@@ -46,12 +71,14 @@ test('blogs are successfully created and increased by one', async () => {
     
     await api
         .post('/api/blogs')
+        .set(headers)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
-    const response = await api.get('/api/blogs')
-
+    const response = await api
+      .get('/api/blogs')
+      .set(headers)
     const contents = response.body.map(r => r.title)
 
     expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
@@ -71,11 +98,14 @@ test('blogs without likes have 0 likes by default', async () => {
     
     await api
         .post('/api/blogs')
+        .set(headers)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
-    const response = await api.get('/api/blogs')
+    const response = await api
+      .get('/api/blogs')
+      .set(headers)
 
     const createdBlog = response.body.find(blog => blog.id==="5a422bc61b54a676234d17fc")
 
@@ -93,15 +123,62 @@ test('blogs without title or url outputs bad request', async () => {
     
     await api
         .post('/api/blogs')
+        .set(headers)
         .send(newBlog)
         .expect(400)
 })
 
+test('adding a blog fails with 401 Unauthorized if token is not provided', async () => {
+  const newBlog = {
+      title: "Unauthorized Access Blog",
+      author: "Anonymous",
+      url: "http://example.com/unauthorized-access",
+      likes: 0
+  };
+
+  // Attempt to create a blog without providing an authorization token
+  await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)  // Expecting HTTP 401 Unauthorized response
+      .expect('Content-Type', /application\/json/);
+});
+
 test('blogs are deleted successfully', async () => {
-    await api
-        .delete('/api/blogs/5a422b891b54a676234d17fa')
-        .expect(204)
-})
+  // Assuming you already have a valid token and the necessary headers setup
+  const newBlog = {
+      title: "Temporary Blog",
+      author: "Test Author",
+      url: "http://example.com/temp-blog",
+      likes: 1
+  };
+
+  // Create a new blog
+  const createdBlogResponse = await api
+      .post('/api/blogs')
+      .set(headers)  // make sure token is defined in your scope
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+  // Extract the ID of the newly created blog
+  const { id } = createdBlogResponse.body;
+
+  // Delete the blog using the ID
+  await api
+      .delete(`/api/blogs/${id}`)
+      .set(headers)  // Authorization header for secure endpoint
+      .expect(204);
+
+  // Optionally verify that the blog no longer exists
+  const finalBlogsResponse = await api
+    .get('/api/blogs')
+    .set(headers)
+  const blogs = finalBlogsResponse.body;
+  const blogExists = blogs.some(blog => blog.id === id);
+  expect(blogExists).toBe(false);
+});
+
 
 test('blogs are updated successfully', async () => {
     const updateBlog = {
@@ -110,11 +187,15 @@ test('blogs are updated successfully', async () => {
 
     await api
         .put('/api/blogs/5a422b891b54a676234d17fa')
+        .set(headers)
         .send(updateBlog)
         .expect(200)
         .expect('Content-Type', /application\/json/)
     
-    const response = await api.get('/api/blogs')
+    const response = await api
+      .get('/api/blogs')
+      .set(headers)
+
     const updatedBlog = response.body.find(blog => blog.id==="5a422b891b54a676234d17fa")
     expect(updatedBlog.likes).toEqual(131)
 })
