@@ -6,11 +6,11 @@ import blogService from './services/blogs'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState(null)
   const [newTitle, setNewTitle ] = useState('')
   const [newAuthor, setNewAuthor ] = useState('')
   const [newUrl, setNewUrl ] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
@@ -45,15 +45,21 @@ const App = () => {
       setNewTitle('')
       setNewAuthor('')
       setNewUrl('')
+      setSuccessMessage(
+        `Blog ${newBlog.title} was successfully added`
+      )
       getBlogs()
       setErrorMessage(null)
       setTimeout(() => {
+        setSuccessMessage(null)
       }, 5000)
     } catch(exception) {
       setErrorMessage(
         `Cannot add blog ${newBlog.title}`
       )
+      setSuccessMessage(null)
       setTimeout(() => {
+        setSuccessMessage(null)
       }, 5000)
     }
   }
@@ -87,6 +93,7 @@ const App = () => {
       setPassword('')
     } catch (exception) {
       setErrorMessage('Wrong credentials')
+      setSuccessMessage(null)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -144,7 +151,8 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        <Notification message={errorMessage} />
+        <Notification errorMessage={errorMessage} successMessage={successMessage} />
+
         {loginForm()}
       </div>
     )
@@ -153,7 +161,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification message={errorMessage} />
+      <Notification errorMessage={errorMessage} successMessage={successMessage} />
       <p>{user.name} logged in <button onClick={logoutEvent}>logout</button> </p> 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} /> 
@@ -161,7 +169,6 @@ const App = () => {
 
       <h2>create new</h2>
       {blogForm()}
-      
     </div>
   )
 }
