@@ -1,21 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
-import loginService from './services/login'
 import blogService from './services/blogs'
+import loginService from './services/login'
 import Togglable from './components/Toggable'
+import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle ] = useState('')
-  const [newAuthor, setNewAuthor ] = useState('')
-  const [newUrl, setNewUrl ] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
-  const noteFormRef = useRef()
+  const blogFormRef = useRef()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -33,53 +30,32 @@ const App = () => {
     setBlogs(blogs)
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-    const newBlog = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
 
     try {
-      noteFormRef.current.toggleVisibility()
-      await blogService
-              .create(newBlog)
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
-      setSuccessMessage(
-        `Blog ${newBlog.title} was successfully added`
-      )
-      getBlogs()
-      setErrorMessage(null)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
+        await blogService
+                .create(blogObject)
+        setSuccessMessage(
+        `Blog ${blogObject.title} was successfully added`
+        )
+        getBlogs()
+        setErrorMessage(null)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
     } catch(exception) {
-      setErrorMessage(
-        `Cannot add blog ${newBlog.title}`
-      )
-      setSuccessMessage(null)
-      setTimeout(() => {
+        setErrorMessage(
+        `Cannot add blog ${blogObject.title}`
+        )
         setSuccessMessage(null)
-      }, 5000)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
     }
   }
 
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value)
-  }
-
-  const handleLogin = async (event) => {
+  const handleLogin = async (username, password) => {
     event.preventDefault()
     try {
       const user = await loginService.login({
@@ -92,8 +68,6 @@ const App = () => {
       blogService.setToken(user.token)
       setUser(user)
       getBlogs()
-      setUsername('')
-      setPassword('')
     } catch (exception) {
       setErrorMessage('Wrong credentials')
       setSuccessMessage(null)
@@ -109,54 +83,12 @@ const App = () => {
     setUser(null)
   }
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>      
-  )
-
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-        <div>
-            Title: <input value={newTitle} onChange={handleTitleChange} />
-        </div>
-        <div>
-            Author: <input value={newAuthor} onChange={handleAuthorChange} />
-        </div>
-        <div>
-            Url: <input value={newUrl} onChange={handleUrlChange} />
-        </div>
-        <div>
-            <button type="submit">add</button>
-        </div>
-    </form>
-  )
-
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
-
-        {loginForm()}
+        <LoginForm sendLogin={handleLogin}/>
       </div>
     )
   }
@@ -171,8 +103,8 @@ const App = () => {
       )}
 
       <h2>create new</h2>
-      <Togglable buttonLabel='new blog' ref={noteFormRef}>
-        {blogForm()}
+      <Togglable buttonLabel='new blog' ref={blogFormRef}>
+        <BlogForm createBlog={addBlog}/>
       </Togglable>
     </div>
   )
