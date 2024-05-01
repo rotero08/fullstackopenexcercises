@@ -19,15 +19,15 @@ const BlogForm = ({createBlog}) => {
     }
     
     const handleTitleChange = (event) => {
-    setNewTitle(event.target.value)
+        setNewTitle(event.target.value)
     }
 
     const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value)
+        setNewAuthor(event.target.value)
     }
 
     const handleUrlChange = (event) => {
-    setNewUrl(event.target.value)
+        setNewUrl(event.target.value)
     }
 
     return(

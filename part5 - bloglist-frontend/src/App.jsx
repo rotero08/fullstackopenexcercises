@@ -55,6 +55,26 @@ const App = () => {
     }
   }
 
+  const updateLikes = async (id,blogObject) => {
+    try {
+      await blogService
+              .update(id,blogObject)
+      getBlogs()
+      setErrorMessage(null)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+  } catch(exception) {
+      setErrorMessage(
+      `Cannot update blog likes`
+      )
+      setSuccessMessage(null)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+  }
+  }
+
   const handleLogin = async (username, password) => {
     try {
       const user = await loginService.login({
@@ -98,7 +118,7 @@ const App = () => {
       <Notification errorMessage={errorMessage} successMessage={successMessage} />
       <p>{user.name} logged in <button onClick={logoutEvent}>logout</button> </p> 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} /> 
+        <Blog key={blog.id} newLikes={updateLikes} blog={blog} /> 
       )}
 
       <h2>create new</h2>
