@@ -75,6 +75,29 @@ const App = () => {
   }
   }
 
+  const deleteBlog = async (id) => {
+    try {
+      await blogService
+              .del(id)
+      getBlogs()
+      setSuccessMessage(
+        `Blog was successfully deleted`
+      )
+      setErrorMessage(null)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+  } catch(exception) {
+      setErrorMessage(
+      `Cannot update blog likes`
+      )
+      setSuccessMessage(null)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+  }
+  }
+
   const handleLogin = async (username, password) => {
     try {
       const user = await loginService.login({
@@ -118,7 +141,7 @@ const App = () => {
       <Notification errorMessage={errorMessage} successMessage={successMessage} />
       <p>{user.name} logged in <button onClick={logoutEvent}>logout</button> </p> 
       {blogs.toSorted((a,b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} newLikes={updateLikes} blog={blog} /> 
+        <Blog key={blog.id} newLikes={updateLikes} delBlog={deleteBlog} blog={blog} currentUser={user}/> 
       )}
 
       <h2>create new</h2>
