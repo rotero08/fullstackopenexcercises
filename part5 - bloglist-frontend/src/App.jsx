@@ -117,7 +117,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification errorMessage={errorMessage} successMessage={successMessage} />
       <p>{user.name} logged in <button onClick={logoutEvent}>logout</button> </p> 
-      {blogs.map(blog =>
+      {blogs.toSorted((a,b) => b.likes - a.likes).map(blog =>
         <Blog key={blog.id} newLikes={updateLikes} blog={blog} /> 
       )}
 
