@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import Notification from './components/Notification'
-import blogService from './services/blogs'
-import loginService from './services/login'
 import Togglable from './components/Toggable'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
+import Notification from './components/Notification'
+import blogService from './services/blogs'
+import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -56,7 +56,6 @@ const App = () => {
   }
 
   const handleLogin = async (username, password) => {
-    event.preventDefault()
     try {
       const user = await loginService.login({
         username, password,
