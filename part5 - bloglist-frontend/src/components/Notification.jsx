@@ -15,5 +15,5 @@ const Notification = ({ errorMessage, successMessage }) => {
     )
   }
 }
-  
-  export default Notification
+
+export default Notification
