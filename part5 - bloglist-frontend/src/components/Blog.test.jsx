@@ -15,8 +15,10 @@ describe('Blog component tests', () => {
     }
   }
 
+  const mockHandler = vi.fn()
+
   beforeEach(() => {
-    container = render(<Blog blog={blog} currentUser={{ username: 'testuser' }} />).container
+    container = render(<Blog blog={blog} newLikes={mockHandler} currentUser={{ username: 'testuser' }} />).container
   })
 
   test('renders title and author, but does not render URL or likes by default', () => {
@@ -35,5 +37,14 @@ describe('Blog component tests', () => {
 
     const div = container.querySelector('.blogTogglable')
     expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('clicking the button twice calls event handler twice', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('like')
+    await user.click(button)
+    await user.click(button)
+
+    expect(mockHandler.mock.calls).toHaveLength(2)
   })
 })
