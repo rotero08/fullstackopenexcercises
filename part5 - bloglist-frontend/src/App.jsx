@@ -34,68 +34,68 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
 
     try {
-        await blogService
-                .create(blogObject)
-        setSuccessMessage(
+      await blogService
+        .create(blogObject)
+      setSuccessMessage(
         `Blog ${blogObject.title} was successfully added`
-        )
-        getBlogs()
-        setErrorMessage(null)
-        setTimeout(() => {
-          setSuccessMessage(null)
-        }, 5000)
-    } catch(exception) {
-        setErrorMessage(
-        `Cannot add blog ${blogObject.title}`
-        )
+      )
+      getBlogs()
+      setErrorMessage(null)
+      setTimeout(() => {
         setSuccessMessage(null)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
+      }, 5000)
+    } catch(exception) {
+      setErrorMessage(
+        `Cannot add blog ${blogObject.title}`
+      )
+      setSuccessMessage(null)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
   }
 
   const updateLikes = async (id,blogObject) => {
     try {
       await blogService
-              .update(id,blogObject)
+        .update(id,blogObject)
       getBlogs()
       setErrorMessage(null)
       setTimeout(() => {
         setSuccessMessage(null)
       }, 5000)
-  } catch(exception) {
+    } catch(exception) {
       setErrorMessage(
-      `Cannot update blog likes`
+        'Cannot update blog likes'
       )
       setSuccessMessage(null)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
-  }
+    }
   }
 
   const deleteBlog = async (id) => {
     try {
       await blogService
-              .del(id)
+        .del(id)
       getBlogs()
       setSuccessMessage(
-        `Blog was successfully deleted`
+        'Blog was successfully deleted'
       )
       setErrorMessage(null)
       setTimeout(() => {
         setSuccessMessage(null)
       }, 5000)
-  } catch(exception) {
+    } catch(exception) {
       setErrorMessage(
-      `Cannot update blog likes`
+        'Cannot update blog likes'
       )
       setSuccessMessage(null)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
-  }
+    }
   }
 
   const handleLogin = async (username, password) => {
@@ -139,9 +139,9 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification errorMessage={errorMessage} successMessage={successMessage} />
-      <p>{user.name} logged in <button onClick={logoutEvent}>logout</button> </p> 
+      <p>{user.name} logged in <button onClick={logoutEvent}>logout</button> </p>
       {blogs.toSorted((a,b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} newLikes={updateLikes} delBlog={deleteBlog} blog={blog} currentUser={user}/> 
+        <Blog key={blog.id} newLikes={updateLikes} delBlog={deleteBlog} blog={blog} currentUser={user}/>
       )}
 
       <h2>create new</h2>
