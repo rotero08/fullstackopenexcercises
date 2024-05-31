@@ -40,9 +40,7 @@ describe('Blog app', () => {
 
   describe('When logged in', () => {
     beforeEach(async ({ page }) => {
-      await page.getByRole('textbox').first().fill('mluukkai')
-      await page.getByRole('textbox').last().fill('salainen')
-      await page.getByRole('button', { name: 'login' }).click()
+      await loginWith(page, 'mluukkai', 'salainen')
     })
   
     test('a new blog can be created', async ({ page }) => {
@@ -66,6 +64,17 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'add' }).click()
       await page.getByRole('button', { name: 'view' }).click()
       await page.getByRole('button', { name: 'like' }).click()
+    })
+
+    test('a blog can be deleted', async ({ page }) => {
+      await page.getByRole('button', { name: 'new blog' }).click()
+      await page.getByTestId('title').fill('titletest')
+      await page.getByTestId('author').fill('authortest')
+      await page.getByTestId('url').fill('urltest')
+      await page.getByRole('button', { name: 'add' }).click()
+      await page.getByRole('button', { name: 'view' }).click()
+      page.on('dialog', dialog => dialog.accept());
+      await page.getByRole('button', { name: 'remove' }).click()
     })
   })
 })
