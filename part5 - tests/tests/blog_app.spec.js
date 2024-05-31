@@ -1,4 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { loginWith, createBlog } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -22,18 +23,12 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await page.getByRole('textbox').first().fill('mluukkai')
-      await page.getByRole('textbox').last().fill('salainen')
-      await page.getByRole('button', { name: 'login' }).click()
-  
-    await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+      await loginWith(page, 'mluukkai', 'salainen')
+      await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await page.getByRole('textbox').first().fill('mluukkai')
-      await page.getByRole('textbox').last().fill('wrong')
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginWith(page, 'mluukkai', 'wrong')
       await expect(page.getByText('wrong credentials')).toBeVisible()
     })
   })
@@ -44,11 +39,7 @@ describe('Blog app', () => {
     })
   
     test('a new blog can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'new blog' }).click()
-      await page.getByTestId('title').fill('titletest')
-      await page.getByTestId('author').fill('authortest')
-      await page.getByTestId('url').fill('urltest')
-      await page.getByRole('button', { name: 'add' }).click()
+      await createBlog(page, 'titletest', 'authortest', 'urltest')
       await expect(page.getByText('Blog titletest was successfully added')).toBeVisible()
       await expect(page.getByText('titletest')).toBeVisible()
       await expect(page.getByText('authortest')).toBeVisible()
@@ -57,24 +48,39 @@ describe('Blog app', () => {
     })
 
     test('a blog can be liked', async ({ page }) => {
-      await page.getByRole('button', { name: 'new blog' }).click()
-      await page.getByTestId('title').fill('titletest')
-      await page.getByTestId('author').fill('authortest')
-      await page.getByTestId('url').fill('urltest')
-      await page.getByRole('button', { name: 'add' }).click()
+      await createBlog(page, 'titletest', 'authortest', 'urltest')
       await page.getByRole('button', { name: 'view' }).click()
       await page.getByRole('button', { name: 'like' }).click()
     })
 
     test('a blog can be deleted', async ({ page }) => {
-      await page.getByRole('button', { name: 'new blog' }).click()
-      await page.getByTestId('title').fill('titletest')
-      await page.getByTestId('author').fill('authortest')
-      await page.getByTestId('url').fill('urltest')
-      await page.getByRole('button', { name: 'add' }).click()
+      await createBlog(page, 'titletest', 'authortest', 'urltest')
       await page.getByRole('button', { name: 'view' }).click()
       page.on('dialog', dialog => dialog.accept());
       await page.getByRole('button', { name: 'remove' }).click()
+    })
+  })
+
+  describe('When multiple users have blogs', () => {
+    beforeEach(async ({ request }) => {
+      await request.post('http://localhost:3003/api/users', {
+        data: {
+          "name": "Jane Doe",
+          "username": "janedoe",
+          "password": "supersecret"
+        }
+      })
+    })
+
+    test('a blog can only be deleted by user who created it', async ({ page }) => {
+      await loginWith(page, 'mluukkai', 'salainen')
+      await createBlog(page, 'titletest', 'authortest', 'urltest')
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByRole('button', { name: 'remove' })).toBeVisible()
+      await page.getByRole('button', { name: 'logout' }).click()
+      await loginWith(page, 'janedoe', 'supersecret')
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
   })
 })
