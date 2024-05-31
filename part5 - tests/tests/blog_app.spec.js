@@ -1,5 +1,6 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, createBlog } = require('./helper')
+const { loginWith, createBlog, loginAndCreateBlogs } = require('./helper')
+const { log } = require('console')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -82,5 +83,33 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'view' }).click()
       await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
+
+    test('all blogs are arranged in the order according to the likes', async ({ page }) => {
+      await loginAndCreateBlogs('mluukkai', 'salainen');
+      await loginAndCreateBlogs('janedoe', 'supersecret');
+      await loginWith(page, 'mluukkai', 'salainen')
+      await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+      await page.waitForTimeout(2000);
+
+      // Get all "view" buttons and click them to reveal likes
+      const viewButtons = await page.getByRole('button', { name: 'view' }).all()
+      for (let i=viewButtons.length-1; i>=0; i--) {
+        await viewButtons[i].click({force: true})
+      }
+    
+      // Get all likes after revealing them
+      const likeElements = await page.getByText('likes:').all();
+      const blogLikes = [];
+      for (let i=0; i<likeElements.length; i++) {
+        const likeText = await likeElements[i].innerText();
+        const likeNumber = parseInt(likeText.replace('likes: ', ''));
+        blogLikes.push(likeNumber);
+      }
+
+      console.log('Blog likes:', blogLikes);
+      const isSorted = blogLikes.every((like, index, array) => index === 0 || array[index - 1] >= like);
+      console.log(isSorted);
+      expect(isSorted).toBe(true);
+    });
   })
 })
