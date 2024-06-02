@@ -31,7 +31,7 @@ const reducer = (state = initialState, action) => {
       return state.map(note => note.id !== id ? note : changedNote)
     }
     case 'NEW_NOTE':
-      return {...state, ok: state.ok + 1}
+      return [...state, action.payload]
     default: return state
   }
 }
