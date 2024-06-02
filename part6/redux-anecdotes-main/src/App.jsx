@@ -1,28 +1,19 @@
 import { useSelector, useDispatch } from 'react-redux'
+import { createNote, incrementVote } from './reducers/anecdoteReducer'
 
 const App = () => {
   const anecdotes = useSelector(state => state)
   const dispatch = useDispatch()
 
   const vote = (id) => {
-    dispatch({
-      type: 'INCREMENT_VOTE',
-      payload: { id }
-    })
+    dispatch(incrementVote(id))
   }
 
   const addNote = (event) => {
     event.preventDefault()
     const content = event.target.note.value
     event.target.note.value = ''
-    dispatch({
-      type: 'NEW_NOTE',
-      payload: {
-        content,
-        id: (100000 * Math.random()).toFixed(0),
-        votes: 0
-      }
-    })
+    dispatch(createNote(content))
   }
 
   return (

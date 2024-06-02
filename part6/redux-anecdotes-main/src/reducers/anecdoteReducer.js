@@ -19,6 +19,24 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(asObject)
 
+export const incrementVote = (id) => {
+  return {
+    type: 'INCREMENT_VOTE',
+    payload: { id }
+  }
+}
+
+export const createNote = (content) => {
+  return {
+    type: 'NEW_NOTE',
+    payload: {
+      content,
+      id: (100000 * Math.random()).toFixed(0),
+      votes: 0
+    }
+  }
+}
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'INCREMENT_VOTE': {
