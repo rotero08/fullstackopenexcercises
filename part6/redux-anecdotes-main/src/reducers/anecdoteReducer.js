@@ -31,13 +31,13 @@ export const createNote = (content) => {
     type: 'NEW_NOTE',
     payload: {
       content,
-      id: getId(),
+      id: (100000 * Math.random()).toFixed(0),
       votes: 0
     }
   }
 }
 
-const anecdoteReducer = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'INCREMENT_VOTE': {
       const id = action.payload.id
@@ -54,4 +54,4 @@ const anecdoteReducer = (state = initialState, action) => {
   }
 }
 
-export default anecdoteReducer
+export default reducer
