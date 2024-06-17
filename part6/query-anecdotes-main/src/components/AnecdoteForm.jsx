@@ -9,21 +9,34 @@ const AnecdoteForm = () => {
 
   const newNoteMutation = useMutation({ 
     mutationFn: createNote, 
-    onSuccess: () => {queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
-  }})
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+    },
+    onError: (error) => {
+      dispatch({
+        type: "SHOW_NOTI",
+        payload: 'too short, anecdote must have length 5 or more'
+      })
+      setTimeout(() => {
+        dispatch({ type: "REMOVE_NOTI" })
+      }, 5000)
+    }
+  })
 
   const onCreate = (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
     newNoteMutation.mutate({ content, votes: 0 })
-    dispatch({ 
-      type: "SHOW_NOTI",
-      payload: `You added '${content}'`
-     })
-    setTimeout(() => {
-      dispatch({type: "REMOVE_NOTI"})
-    }, 5000)
+    if (content.length >= 5) {
+      dispatch({ 
+        type: "SHOW_NOTI",
+        payload: `You added '${content}'`
+      })
+      setTimeout(() => {
+        dispatch({type: "REMOVE_NOTI"})
+      }, 5000)
+  }
 }
 
   return (
