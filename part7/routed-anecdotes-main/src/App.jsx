@@ -83,6 +83,12 @@ const CreateNew = (props) => {
     navigate('/')
   }
 
+  const handleReset = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
@@ -100,6 +106,7 @@ const CreateNew = (props) => {
           <input {...info} />
         </div>
         <button>create</button>
+        <button type="button" onClick={handleReset}>reset</button>
       </form>
     </div>
   )
@@ -142,7 +149,9 @@ const App = () => {
     : null
 
   const vote = (id) => {
-    const anecdote = anecdoteById(id)
+    const anecdote = match
+      ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
+      : null
 
     const voted = {
       ...anecdote,
