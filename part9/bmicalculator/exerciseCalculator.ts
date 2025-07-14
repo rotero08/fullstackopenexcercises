@@ -9,13 +9,11 @@ const parseArgumentss = (args: string[]): exerciseDays => {
   }
   return {
     value1: Number(args[2]),
-    value2: args.slice(2).map(Number)
+    value2: args.slice(3).map(Number)
   }
 }
 
 const calculateExercises = (target: number, days: number[]) => {
-  console.log(days);
-  
   const periodLength = days.length;
   const trainingDays = days.reduce((accumulator, currentValue) => currentValue===0? accumulator : accumulator + 1 , 0);
   const average = days.reduce((accumulator, currentValue) => accumulator + currentValue, 0) / periodLength;
@@ -45,7 +43,7 @@ const calculateExercises = (target: number, days: number[]) => {
 
 try {
   const { value1, value2 } = parseArgumentss(process.argv);
-    console.log(calculateExercises(2, [3, 0, 2, 4.5, 0, 3, 1]));
+    console.log(calculateExercises(value1, value2));
 } catch (error: unknown) {
   let errorMessage = 'Something bad happened.'
   if (error instanceof Error) {
